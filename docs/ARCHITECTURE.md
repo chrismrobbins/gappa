@@ -31,6 +31,10 @@ accounts and progress in Supabase, voices pre-recorded with ElevenLabs.
 | `src/content/**` | lead | Course data only (`COURSES`, `DEFAULT_LANG`, `getCourse`) |
 | `src/lib/username.ts` | services | Username normalization, email mapping and form rules (shared with `api/signup`) |
 | `src/lib/speechMode.ts` | services | Pure speech-mode decision (`resolveMode`) |
+| `src/lib/reviewItems.ts` | teacher | `reviewItems`, `reviewSections`, `reviewProgress`, `lessonTitles`: every reviewable line with a stable key |
+| `src/lib/reviewDraft.ts`, `fixes.ts`, `cardKey.ts` | teacher | Fix-form draft -> `ReviewInput`, open-fix grouping, card -> review key |
+| `src/services/reviews.ts` | teacher | Role, reviews, profiles, `setRole` (tolerates cloud off / migration missing) |
+| `src/ui/teacher/**` | teacher | Review content, Teachers, Open fixes screens, in-lesson flag |
 | `src/lib/dates.ts` | core | Local date keys and day arithmetic |
 | `src/lib/progress/*` | core | Pure progress logic (see API) |
 | `src/engine/*` | engine | Builds lesson/review/checkpoint card queues, grades answers |
@@ -72,7 +76,7 @@ isUnlocked(p: Progress, course: Course, lessonId: string): boolean
 **Accuracy** = share of exercises right on the *first* try (results list one entry per exercise
 attempt; the first result per key counts). **Passed**: lessons/script/review always pass;
 checkpoints pass at `CHECKPOINT_PASS`. XP: `XP.lesson` (+`XP.perfectBonus` at 100%), `XP.script`,
-`XP.review`, `XP.checkpoint` (first pass only; a failed checkpoint earns 0). Replaying a finished
+`XP.intro`, `XP.review`, `XP.checkpoint` (first pass only; a failed checkpoint earns 0). Replaying a finished
 lesson earns half XP (rounded down).
 
 **Streaks** are derived only from `days` (so merging is trivial). A day counts if `sessions > 0`.
@@ -81,7 +85,9 @@ consecutive days earns a freeze (max `STREAK_FREEZE.max`); a missed day (not tod
 freeze (streak continues, date goes in `frozenDays`) or resets the streak to 0. Today being
 inactive never breaks the streak.
 
-**Unlocking**: script lessons unlock in order; unit lessons unlock in order across units; a
+**Unlocking**: script lessons unlock in order (an independent track); intro lessons unlock in order and
+the first unit lesson (`mr-1-1`) unlocks once all of them are done; unit lessons then unlock in order
+across units; a lesson already completed stays unlocked; a
 checkpoint (`<unitId>-cp`) unlocks when all its unit's lessons are done.
 
 **Sync** (`src/ui/state/useProgressStore.ts`): on sign-in the cloud copy is pulled and merged into
@@ -95,9 +101,10 @@ settings → newer `updatedAt` wins.
 
 ### `src/engine/` (pure; re-exported from `src/engine/index.ts`)
 ```ts
-itemKey(lessonId: string, kind: 'w' | 'p' | 'l', target: string): ItemKey
+itemKey(lessonId: string, kind: EntryKind, target: string): ItemKey   // 'w' | 'p' | 'l' | 't' (tip example) | 'i' (intro example)
 buildLesson(course: Course, lessonId: string, rng?: Rng): Card[]
 buildScriptLesson(course: Course, scriptId: string, rng?: Rng): Card[]
+buildIntroLesson(course: Course, introId: string, rng?: Rng): Card[]
 buildReview(course: Course, keys: ItemKey[], rng?: Rng): Card[]
 buildCheckpoint(course: Course, unitId: string, rng?: Rng): Card[]
 gradeChoice(card: ChoiceCard, index: number): boolean
@@ -117,6 +124,13 @@ lessons of the course; never duplicate the right answer's text or meaning.
 
 **Script lessons**: `teach-letters` (2–3 letters) → `choice` letter→sound (rom), `choice`
 sound(audio)→letter; end with a `match` letter↔rom.
+
+**Intro lessons** ("Start here", `src/content/mr/intro.ts`, session kind `intro`): per slide a `slide`
+card (teaching only: title, body, worked examples with optional build-up `parts`), then, if the slide
+has a `check`, a `choice` card (key `${lessonId}|q|${slideIndex}`, authored option order, `explain`
+shown in the feedback sheet right or wrong). Checks are not vocabulary: `recordSession` creates no SRS
+cards for `intro` sessions, so they never appear in Review. Every example `text` and check `prompt` is
+an audio line (`scripts/lines.ts`).
 
 **Review / checkpoint**: one exercise per key, type picked from the item kind (word → choice,
 phrase → tiles or choice, letter → choice). Checkpoint = `CHECKPOINT_SIZE` items from the unit.
@@ -145,6 +159,11 @@ say(text: string, opts?: { slow?: boolean; lang?: LangId }): void   // recorded 
 resolveSpeechMode(setting: SpeechMode): 'browser' | 'server' | 'off'
 startListening(lang: LangId, mode: 'browser' | 'server'): Listener
 interface Listener { stop(): Promise<string>; cancel(): void }
+// reviews.ts (teacher mode; reads return empty / 'learner' when cloud is off or 0002 is not applied)
+fetchMyRole(): Promise<Role> ; fetchMyReviews(): Promise<Review[]> ; saveReview(input: ReviewInput): Promise<Review>
+fetchAllOpenFixes(): Promise<OpenFix[]> ; resolveReview(id: string): Promise<void>      // admin
+listProfiles(): Promise<ProfileRow[]> ; setRole(username: string, role: Role): Promise<void>   // admin
+// audio.ts also: sayWithVoice(text, voiceId, lang?): boolean   // one specific voice's clip; false if not recorded
 // sfx.ts
 sfx(name: 'correct' | 'wrong' | 'finish' | 'tap'): void
 ```
@@ -153,7 +172,7 @@ sfx(name: 'correct' | 'wrong' | 'finish' | 'tap'): void
 
 The course is recorded in every voice in `VOICES` (`src/config.ts`: id, name, gender, ElevenLabs id).
 `npm run voices` (scripts/record-voices.ts) collects every line the course can say (words, phrases,
-tip examples, letters and letter examples), records missing ones with ElevenLabs into
+tip examples, intro examples and check prompts, letters and letter examples), records missing ones with ElevenLabs into
 `public/audio/<lang>/<voiceId>/<audioKey>.mp3`, and writes `public/audio/<lang>/<voiceId>/index.json`
 (array of keys) per voice. `--voice <id>` records one voice; `--dry` only counts (per voice, total,
 budget left). Monthly character use across all voices is tracked in `scripts/voice-usage.json` and
@@ -165,6 +184,17 @@ service (`setVoicePreference`), so `say()` callers never pass it. `say()` asks t
 otherwise a random voice that does ('mix' always picks randomly, so an unknown saved id also works);
 with no recorded clip it falls back to the device voice (`mr-IN`, then `hi-IN`). Settings previews a
 voice with `previewVoice(pref)`. Slow playback uses `playbackRate`, never a second recording.
+
+## Teacher mode
+
+`profiles.role` is `learner` (default), `teacher` or `admin` (`supabase/migrations/0002_teachers.sql`).
+Clients cannot write profiles; admins change roles through the `set_role` RPC (or `npm run set-role`).
+`content_reviews` holds one row per teacher and line (`item_key` = engine `itemKey`, plus a snapshot of
+the reviewed text): verdict `ok`/`fix`, correction, comment, the voice that sounded wrong, and status
+`open`/`resolved`. RLS: teachers write and read their own rows; admins read and resolve all. The role is
+loaded once by `useRole` (in `ProgressProvider` context as `role`). Me shows the teacher cards, which open
+views held in `App`'s view state; `RunnerTop` shows a flag for teachers via `useFlagItem`. `npm run feedback`
+lists open fixes for the developer.
 
 ## Speech input
 

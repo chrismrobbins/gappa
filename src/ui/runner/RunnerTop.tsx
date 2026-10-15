@@ -2,8 +2,12 @@ import { useState } from 'react'
 import { ConfirmDialog } from '../common/ConfirmDialog'
 import { CloseIcon } from '../common/Icons'
 import { ProgressBar } from '../common/ProgressBar'
+import { FlagButton } from '../teacher/FlagButton'
+import type { ReviewItem } from '../../lib/reviewItems'
 
-export function RunnerTop({ fraction, onExit }: { fraction: number; onExit(): void }) {
+interface TopProps { fraction: number; onExit(): void; flag?: ReviewItem }
+
+export function RunnerTop({ fraction, onExit, flag }: TopProps) {
   const [asking, setAsking] = useState(false)
   return (
     <header className="runner-top">
@@ -12,6 +16,7 @@ export function RunnerTop({ fraction, onExit }: { fraction: number; onExit(): vo
           <CloseIcon size={26} />
         </button>
         <ProgressBar value={Math.round(fraction * 100)} max={100} label="Lesson progress" />
+        {flag && <FlagButton item={flag} />}
       </div>
       {asking && (
         <ConfirmDialog title="Leave this lesson?" body="Your progress in this lesson will be lost."

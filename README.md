@@ -68,6 +68,21 @@ npm run reset-password -- <username> <newPassword>
 
 These use `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from `.env`.
 
+## Teachers
+
+Teacher mode lets a native speaker review every word, phrase, letter and example (text,
+romanization, English and each recorded voice) and flag fixes, which you then see and resolve.
+
+1. Paste `supabase/migrations/0002_teachers.sql` into the Supabase SQL editor and run it.
+2. Make yourself the admin: `npm run set-role -- chrismrobbins admin`.
+3. Invite her with `npm run invite`, and have her sign up with the code.
+4. Make her a teacher from **Me → Teachers → Make teacher**, or `npm run set-role -- <username> teacher`.
+5. She now sees **Review content** on Me (and a flag button inside lessons). Read what she found
+   with `npm run feedback` (grouped by lesson, with ids), then mark one done with
+   `npm run feedback -- --resolve <id>` or from **Me → Open fixes**.
+
+Until 0002 is applied the app works as before; nobody sees teacher tools.
+
 ## Recording voices
 
 The course is recorded in every voice listed in `VOICES` (`src/config.ts`). The recorder collects every

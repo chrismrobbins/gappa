@@ -1,5 +1,6 @@
 export { itemKey, findEntry } from './keys'
 export { buildLesson } from './lesson'
 export { buildScriptLesson } from './script'
+export { buildIntroLesson } from './intro'
 export { buildReview, buildCheckpoint } from './review'
 export { gradeChoice, gradeTiles, gradeSpeech } from './grade'

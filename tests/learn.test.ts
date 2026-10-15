@@ -15,6 +15,13 @@ describe('nextNode', () => {
     expect(nextNode(course, emptyProgress(0), 'letters')?.id).toBe(course.script[0].id)
   })
 
+  it('starts a new learner on the intro lessons, then moves to Unit 1', () => {
+    const progress = emptyProgress(0)
+    expect(nextNode(course, progress, 'lessons')?.kind).toBe('intro')
+    course.intro.forEach((l) => { progress.lessons[l.id] = DONE })
+    expect(nextNode(course, progress, 'lessons')?.id).toBe(course.units[0].lessons[0].id)
+  })
+
   it('moves on once a lesson is done and ends with null when everything is', () => {
     const progress = emptyProgress(0)
     const [a, b] = sectionsFor(course, 'letters')[0].nodes

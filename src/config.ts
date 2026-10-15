@@ -6,6 +6,7 @@ export const XP = {
   lesson: 10,
   perfectBonus: 5,
   script: 8,
+  intro: 5,
   review: 5,
   checkpoint: 20,
 } as const

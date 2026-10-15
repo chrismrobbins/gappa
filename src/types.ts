@@ -52,12 +52,48 @@ export interface ScriptLesson {
   letters: Letter[]
 }
 
+/** A worked example on an intro slide; `text` is spoken. */
+export interface IntroExample {
+  /** Optional build-up shown before the result, e.g. ['क', 'ा'] → का. */
+  parts?: string[]
+  text: string
+  rom: string
+  en?: string
+}
+
+/** A quick multiple-choice check placed right after a slide. */
+export interface IntroCheck {
+  question: string
+  /** Big target-language text to read (and play) above the options. */
+  prompt?: string
+  options: string[]
+  answer: number
+  /** One line shown after answering, right or wrong. */
+  explain: string
+}
+
+export interface IntroSlide {
+  title: string
+  /** Short paragraphs. `**bold**` marks target-language text. */
+  body: string[]
+  examples?: IntroExample[]
+  check?: IntroCheck
+}
+
+/** "How the language works" lessons: explanation slides with light checks, before Unit 1. */
+export interface IntroLesson {
+  id: string
+  title: string
+  slides: IntroSlide[]
+}
+
 export interface Course {
   lang: LangId
   name: string
   nativeName: string
   /** BCP-47 locale for device speech, e.g. 'mr-IN'. */
   locale: string
+  intro: IntroLesson[]
   script: ScriptLesson[]
   units: Unit[]
 }
@@ -86,17 +122,25 @@ export interface TipCard {
   kind: 'tip'
   tip: Tip
 }
+/** An intro slide: teaching only, nothing to answer. */
+export interface SlideCard {
+  kind: 'slide'
+  slide: IntroSlide
+}
 export interface ChoiceCard {
   kind: 'choice'
   key: ItemKey
   instruction: string
-  prompt: Shown
+  /** Absent for a plain question with nothing to read. */
+  prompt?: Shown
   /** Target-language text to play as audio. */
   say?: string
   /** Listening exercise: show only the audio button, not the prompt text. */
   hidePrompt?: boolean
   options: Shown[]
   answer: number
+  /** One line shown after answering, right or wrong. */
+  explain?: string
 }
 export interface MatchCard {
   kind: 'match'
@@ -122,7 +166,7 @@ export interface SpeakCard {
 }
 
 export type ExerciseCard = ChoiceCard | MatchCard | TilesCard | SpeakCard
-export type Card = TeachCard | TeachLettersCard | TipCard | ExerciseCard
+export type Card = TeachCard | TeachLettersCard | TipCard | SlideCard | ExerciseCard
 
 export interface ExerciseResult {
   key: ItemKey
@@ -185,7 +229,7 @@ export interface Progress {
   badges: Record<string, number>
 }
 
-export type SessionKind = 'lesson' | 'script' | 'review' | 'checkpoint'
+export type SessionKind = 'lesson' | 'script' | 'intro' | 'review' | 'checkpoint'
 
 export interface SessionInput {
   kind: SessionKind
@@ -222,4 +266,41 @@ export interface BadgeDef {
   id: string
   name: string
   description: string
+}
+
+// ---------- Teacher mode ----------
+
+export type Role = 'learner' | 'teacher' | 'admin'
+export type ReviewVerdict = 'ok' | 'fix'
+export type ReviewStatus = 'open' | 'resolved'
+
+/** What a teacher sends when checking or flagging one line. `voice`: a voice id, 'all', or null. */
+export interface ReviewInput {
+  itemKey: ItemKey
+  lessonId: string
+  /** Snapshot of the text that was reviewed. */
+  target: string
+  verdict: ReviewVerdict
+  correction: string | null
+  comment: string | null
+  voice: string | null
+}
+
+/** A saved review (one per reviewer and line). */
+export interface Review extends ReviewInput {
+  id: string
+  status: ReviewStatus
+  createdAt: string
+  reviewerId: string
+}
+
+/** An open fix with the reviewer's username, for the admin. */
+export interface OpenFix extends Review {
+  reviewer: string
+}
+
+export interface ProfileRow {
+  id: string
+  username: string
+  role: Role
 }

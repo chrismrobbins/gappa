@@ -86,3 +86,15 @@ export function say(text: string, opts: { slow?: boolean; lang?: LangId } = {}):
 export function previewVoice(pref: VoicePref): void {
   play(VOICE_PREVIEW_LINE, DEFAULT_LANG, false, pref)
 }
+
+/**
+ * Plays one specific voice's recording of `text` (for teachers checking each voice).
+ * Returns false when that voice has no clip yet, so the UI can say so instead of playing another voice.
+ */
+export function sayWithVoice(text: string, voiceId: string, lang: LangId = DEFAULT_LANG): boolean {
+  const key = audioKey(text)
+  if (!voicesWith(lang, key).includes(voiceId)) return false
+  stopAll()
+  playClip(lang, voiceId, key, false)
+  return true
+}

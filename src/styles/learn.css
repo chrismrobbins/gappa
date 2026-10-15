@@ -15,6 +15,7 @@
 .tone-u2 { --unit: var(--indigo-deep); --unit-edge: var(--indigo-edge); --unit-on: var(--on-color); }
 .tone-u3 { --unit: var(--kumkum-deep); --unit-edge: var(--kumkum-edge); --unit-on: var(--on-color); }
 .tone-u4 { --unit: var(--saffron-deep); --unit-edge: var(--saffron-edge); --unit-on: var(--on-color); }
+.tone-intro { --unit: var(--marigold); --unit-edge: var(--marigold-edge); --unit-on: var(--on-marigold); }
 .tone-letters { --unit: var(--turmeric); --unit-edge: var(--turmeric-edge); --unit-on: var(--on-marigold); }
 .unit-banner {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);

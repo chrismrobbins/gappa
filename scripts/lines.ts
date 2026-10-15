@@ -12,8 +12,13 @@ function letterLines(course: Course): string[] {
   return course.script.flatMap((s) => s.letters.flatMap((l) => [l.char, l.example.target]))
 }
 
+function introLines(course: Course): string[] {
+  const slides = course.intro.flatMap((l) => l.slides)
+  return slides.flatMap((s) => [...(s.examples ?? []).map((e) => e.text), ...(s.check?.prompt ? [s.check.prompt] : [])])
+}
+
 export function collectLines(course: Course): string[] {
-  const all = [...letterLines(course), ...lessonItems(course).map((i) => i.target)]
+  const all = [...letterLines(course), ...introLines(course), ...lessonItems(course).map((i) => i.target)]
   return [...new Set(all.map(canonicalLine).filter(Boolean))]
 }
 

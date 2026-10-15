@@ -143,8 +143,11 @@ describe('settings', () => {
 describe('unlocking with the real course', () => {
   const scriptIds = course.script.map((s) => s.id)
   const lessonIds = course.units[0].lessons.map((l) => l.id)
+  const introIds = course.intro.map((l) => l.id)
   const done = (...ids: string[]): Progress => {
     const p = emptyProgress(0)
+    // The intro lessons gate Unit 1, so unit-lesson tests start with them finished.
+    introIds.forEach((id) => { p.lessons[id] = { completedAt: 1, bestAccuracy: 1, count: 1 } })
     ids.forEach((id) => { p.lessons[id] = { completedAt: 1, bestAccuracy: 1, count: 1 } })
     return p
   }
@@ -247,5 +250,34 @@ describe('voice setting', () => {
   it('keeps a saved voice id', () => {
     const p = updateSettings(emptyProgress(0), { voice: 'vinayak' }, 1)
     expect(asProgress(JSON.parse(JSON.stringify(p)))?.settings.voice).toBe('vinayak')
+  })
+})
+
+describe('intro lessons', () => {
+  const intro = course.intro.map((l) => l.id)
+  const first = course.units[0].lessons[0].id
+  const doneIds = (...ids: string[]): Progress => {
+    const p = emptyProgress(0)
+    ids.forEach((id) => { p.lessons[id] = { completedAt: 1, bestAccuracy: 1, count: 1 } })
+    return p
+  }
+  it('unlocks in order, and the first unit lesson only after all of them', () => {
+    expect(isUnlocked(doneIds(), course, intro[0])).toBe(true)
+    expect(isUnlocked(doneIds(), course, intro[1])).toBe(false)
+    expect(isUnlocked(doneIds(intro[0]), course, intro[1])).toBe(true)
+    expect(isUnlocked(doneIds(...intro.slice(0, -1)), course, first)).toBe(false)
+    expect(isUnlocked(doneIds(...intro), course, first)).toBe(true)
+  })
+  it('keeps a finished lesson unlocked and leaves the script track alone', () => {
+    expect(isUnlocked(doneIds(first), course, first)).toBe(true)
+    expect(isUnlocked(doneIds(), course, course.script[0].id)).toBe(true)
+  })
+  it('earns XP.intro (half on replay) and never creates review cards', () => {
+    const r = [{ key: `${intro[0]}|q|0`, correct: true }]
+    const out = recordSession(emptyProgress(0), input('intro', intro[0], r), course)
+    expect(out.xpEarned).toBe(5)
+    expect(out.progress.cards).toEqual({})
+    expect(out.progress.lessons[intro[0]]?.count).toBe(1)
+    expect(sessionXp(input('intro', intro[0], r), 1, true)).toBe(2)
   })
 })

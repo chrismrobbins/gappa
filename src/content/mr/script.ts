@@ -94,4 +94,21 @@ export const script: ScriptLesson[] = [
       letter('झ', 'jha', 'झाड', 'jhaad', 'tree'),
     ],
   },
+  {
+    id: 'mr-s-8',
+    title: 'Numerals',
+    note: 'Marathi has its own digits, used on signs, calendars and prices.',
+    letters: [
+      letter('१', '1', 'एक', 'ek', 'one'),
+      letter('२', '2', 'दोन', 'don', 'two'),
+      letter('३', '3', 'तीन', 'teen', 'three'),
+      letter('४', '4', 'चार', 'chaar', 'four'),
+      letter('५', '5', 'पाच', 'paach', 'five'),
+      letter('६', '6', 'सहा', 'sahaa', 'six'),
+      letter('७', '7', 'सात', 'saat', 'seven'),
+      letter('८', '8', 'आठ', 'aath', 'eight'),
+      letter('९', '9', 'नऊ', 'nau', 'nine'),
+      letter('१०', '10', 'दहा', 'dahaa', 'ten'),
+    ],
+  },
 ]

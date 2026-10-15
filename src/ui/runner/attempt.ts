@@ -10,6 +10,8 @@ export interface Attempt {
   auto?: boolean
   /** Message used instead of the standard wrong-answer text. */
   note?: string
+  /** One line of explanation shown in the feedback, right or wrong. */
+  explain?: string
 }
 
 /** The first accepted answer, rebuilt from tiles so it carries romanization. */

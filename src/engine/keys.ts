@@ -2,7 +2,9 @@
 
 import type { Course, Item, ItemKey, Lesson, Letter, ScriptLesson } from '../types'
 
-export type EntryKind = 'w' | 'p' | 'l'
+/** w word, p phrase, l letter (and its example), t tip example, i intro-slide example. */
+export const ENTRY_KINDS = ['w', 'p', 'l', 't', 'i'] as const
+export type EntryKind = (typeof ENTRY_KINDS)[number]
 
 interface ParsedKey {
   lessonId: string
@@ -16,9 +18,9 @@ export function itemKey(lessonId: string, kind: EntryKind, target: string): Item
 
 export function parseKey(key: ItemKey): ParsedKey | undefined {
   const [lessonId, kind, ...rest] = key.split('|')
-  const validKind = kind === 'w' || kind === 'p' || kind === 'l'
-  if (!lessonId || !validKind || rest.length === 0) return undefined
-  return { lessonId, kind, target: rest.join('|') }
+  const entryKind = ENTRY_KINDS.find((k) => k === kind)
+  if (!lessonId || !entryKind || rest.length === 0) return undefined
+  return { lessonId, kind: entryKind, target: rest.join('|') }
 }
 
 export function lessonsOf(course: Course): Lesson[] {

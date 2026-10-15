@@ -5,6 +5,8 @@ import { FlameIcon, SnowflakeIcon, StarIcon, TrophyIcon } from '../common/Icons'
 import { ProgressBar } from '../common/ProgressBar'
 import { useProgress } from '../state/ProgressProvider'
 import { useDayStats } from '../state/useDayStats'
+import { TeacherCards } from '../teacher/TeacherCards'
+import type { TeacherScreen } from '../teacher/screens'
 import { BadgeGrid } from './BadgeGrid'
 import { SettingsPanel } from './SettingsPanel'
 
@@ -60,7 +62,7 @@ function StatsGrid() {
   )
 }
 
-export function MeScreen() {
+export function MeScreen({ onTeacher }: { onTeacher(s: TeacherScreen): void }) {
   const { progress, cloud, signOut } = useProgress()
   return (
     <div className="screen">
@@ -70,6 +72,7 @@ export function MeScreen() {
         <h2 className="section-title">Badges</h2>
         <div className="card"><BadgeGrid earned={progress.badges} /></div>
       </section>
+      <TeacherCards onOpen={onTeacher} />
       <SettingsPanel />
       {cloud
         ? <button type="button" className="btn btn-ghost" onClick={() => void signOut()}>Sign out</button>

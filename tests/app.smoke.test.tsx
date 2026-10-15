@@ -79,8 +79,24 @@ describe('app smoke test (local mode)', () => {
     expect(savedProgress().lessons['mr-s-1']?.count).toBe(1)
   })
 
-  // Runs after the letters test on the same storage, so the day should show exactly two sessions.
+  it('plays the first intro lesson (slides and checks) and records it once', async () => {
+    const { App } = await import('../src/ui/App')
+    render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: /^Meet the script, unlocked$/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Start' }))
+    playToFinish()
+
+    expect(screen.getByText('Lesson complete!')).toBeTruthy()
+    expect(savedProgress().lessons['mr-0-1']?.count).toBe(1)
+    expect(Object.keys(savedProgress().cards).filter((k) => k.startsWith('mr-0-'))).toEqual([])
+  })
+
+  // Runs on the same storage as the tests above, with the intro lessons marked done to open Unit 1.
   it('plays the first unit lesson (teach, choice, match, tiles) and records it once', async () => {
+    const saved = savedProgress()
+    for (const id of ['mr-0-1', 'mr-0-2', 'mr-0-3', 'mr-0-4', 'mr-0-5', 'mr-0-6'])
+      saved.lessons[id] = { completedAt: 1, bestAccuracy: 1, count: 1 }
+    localStorage.setItem('gappa.progress.v1', JSON.stringify(saved))
     const { App } = await import('../src/ui/App')
     render(<App />)
     fireEvent.click(screen.getByRole('button', { name: /^Greetings, unlocked$/ }))
@@ -88,9 +104,7 @@ describe('app smoke test (local mode)', () => {
     playToFinish()
 
     expect(screen.getByText('Lesson complete!')).toBeTruthy()
-    const lessonId = Object.keys(savedProgress().lessons).find((id) => id !== 'mr-s-1')
-    expect(lessonId).toBeDefined()
-    expect(savedProgress().lessons[lessonId ?? '']?.count).toBe(1)
-    expect(Object.values(savedProgress().days)[0]?.sessions).toBe(2)
+    expect(savedProgress().lessons['mr-1-1']?.count).toBe(1)
+    expect(Object.values(savedProgress().days)[0]?.sessions).toBe(3)
   })
 })

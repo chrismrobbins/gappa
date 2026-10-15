@@ -3,12 +3,13 @@ import { Native } from '../common/Native'
 import type { Attempt } from './attempt'
 
 function Verdict({ attempt }: { attempt: Attempt }) {
-  const { correct, reveal, note } = attempt
+  const { correct, reveal, note, explain } = attempt
   return (
     <div className="feedback-head">
       {correct ? <CheckCircleIcon size={52} /> : <XCircleIcon size={52} />}
       <div className="feedback-text">
         <strong>{correct ? 'Nice!' : note ?? 'Not quite'}</strong>
+        {explain && <span className="feedback-explain">{explain}</span>}
         {!correct && reveal && (
           <>
             <span className="muted">Correct answer</span>

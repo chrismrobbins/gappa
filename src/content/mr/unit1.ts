@@ -142,5 +142,36 @@ export const unit1: Unit = {
         it('माफ करा, मला समजलं नाही.', 'maaf karaa, malaa samajla naahee.', 'Sorry, I didn’t understand.'),
       ],
     },
+    {
+      id: 'mr-1-6',
+      title: 'Numbers 1–10',
+      tip: {
+        title: 'Having something',
+        body: [
+          'Marathi does not say “I have”. It says **मला … आहे**: literally “to me … is”. **मला एक बहीण आहे** means “I have one sister”.',
+          'With more than one, use **आहेत**: **मला दोन भाऊ आहेत**. Ask “how many?” with **किती**.',
+        ],
+      },
+      words: [
+        it('एक', 'ek', 'one'),
+        it('दोन', 'don', 'two'),
+        it('तीन', 'teen', 'three'),
+        it('चार', 'chaar', 'four'),
+        it('पाच', 'paach', 'five'),
+        it('सहा', 'sahaa', 'six'),
+        it('सात', 'saat', 'seven'),
+        it('आठ', 'aath', 'eight'),
+        it('नऊ', 'nau', 'nine'),
+        it('दहा', 'dahaa', 'ten'),
+        it('किती', 'kitee', 'how many', { alsoEn: ['how much'] }),
+      ],
+      phrases: [
+        it('एक, दोन, तीन!', 'ek, don, teen!', 'One, two, three!'),
+        it('मला एक बहीण आहे.', 'malaa ek baheen aahe.', 'I have one sister.'),
+        it('मला दोन भाऊ आहेत.', 'malaa don bhaaoo aahet.', 'I have two brothers.'),
+        it('किती भाऊ आहेत?', 'kitee bhaaoo aahet?', 'How many brothers?'),
+        it('दोन चहा द्या.', 'don chahaa dyaa.', 'Two teas, please.', { note: 'द्या means “give”' }),
+      ],
+    },
   ],
 }

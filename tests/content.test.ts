@@ -14,7 +14,7 @@ function allItems(c: Course): Item[] {
 
 describe.each(courses)('course $lang content', (course) => {
   it('has unique lesson ids across lessons, script lessons and units', () => {
-    const ids = [...lessonsOf(course).map((l) => l.id), ...course.script.map((s) => s.id), ...course.units.map((u) => u.id)]
+    const ids = [...course.intro.map((l) => l.id), ...lessonsOf(course).map((l) => l.id), ...course.script.map((s) => s.id), ...course.units.map((u) => u.id)]
     expect(new Set(ids).size).toBe(ids.length)
   })
 
@@ -40,6 +40,22 @@ describe.each(courses)('course $lang content', (course) => {
     for (const l of course.script.flatMap((s) => s.letters)) {
       expect(l.char.trim()).not.toBe('')
       expect(l.rom.trim(), l.char).not.toBe('')
+    }
+  })
+
+  it('has valid intro lessons', () => {
+    for (const lesson of course.intro) {
+      expect(lesson.slides.length, lesson.id).toBeGreaterThan(0)
+      for (const slide of lesson.slides) {
+        for (const ex of slide.examples ?? []) {
+          expect(ex.text.trim(), lesson.id).not.toBe('')
+          expect(ex.rom.trim(), ex.text).not.toBe('')
+        }
+        const check = slide.check
+        if (!check) continue
+        expect(Number.isInteger(check.answer) && check.answer >= 0 && check.answer < check.options.length, check.question).toBe(true)
+        expect(new Set(check.options).size, check.question).toBe(check.options.length)
+      }
     }
   })
 

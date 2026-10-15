@@ -3,14 +3,16 @@ import { DEFAULT_LANG, getCourse } from '../../content'
 import { recordSession, updateSettings } from '../../lib/progress'
 import { loadVoiceIndex, setVoicePreference } from '../../services/audio'
 import { signOut as authSignOut } from '../../services/auth'
-import type { Course, Progress, SessionInput, SessionOutcome, Settings } from '../../types'
+import type { Course, Progress, Role, SessionInput, SessionOutcome, Settings } from '../../types'
 import { useProgressStore } from './useProgressStore'
+import { useRole } from './useRole'
 
 interface ProgressApi {
   progress: Progress
   course: Course
   username: string | null
   cloud: boolean
+  role: Role
   finishSession(input: SessionInput): SessionOutcome
   changeSettings(patch: Partial<Settings>): void
   signOut(): Promise<void>
@@ -22,6 +24,7 @@ const course = getCourse(DEFAULT_LANG)
 export function ProgressProvider(props: { cloud: boolean; username: string | null; children: ReactNode }) {
   const { cloud, username, children } = props
   const { progress, setProgress, flush } = useProgressStore(cloud, username)
+  const role = useRole()
   // recordSession must see the newest progress even if two calls land before a re-render.
   const latest = useRef(progress)
   latest.current = progress
@@ -42,8 +45,8 @@ export function ProgressProvider(props: { cloud: boolean; username: string | nul
   )
   const signOut = useCallback(() => flush().then(authSignOut), [flush])
   const value = useMemo(
-    () => ({ progress, course, username, cloud, finishSession, changeSettings, signOut }),
-    [progress, username, cloud, finishSession, changeSettings, signOut],
+    () => ({ progress, course, username, cloud, role, finishSession, changeSettings, signOut }),
+    [progress, username, cloud, role, finishSession, changeSettings, signOut],
   )
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

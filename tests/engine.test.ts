@@ -4,7 +4,7 @@ import { seededRng } from '../src/lib/random'
 import { CHECKPOINT_SIZE } from '../src/config'
 import { displayTokens, tokens } from '../src/lib/text'
 import {
-  buildCheckpoint, buildLesson, buildReview, buildScriptLesson, findEntry,
+  buildCheckpoint, buildIntroLesson, buildLesson, buildReview, buildScriptLesson, findEntry,
   gradeChoice, gradeSpeech, gradeTiles, itemKey,
 } from '../src/engine'
 import type { Card, ChoiceCard, Course, ExerciseCard, ItemKey, TilesCard } from '../src/types'
@@ -180,5 +180,28 @@ describe('grading', () => {
     expect(gradeSpeech(phrase, 'hello there')).toBe(false)
     expect(gradeSpeech(phrase, '')).toBe(false)
     expect(tokens(phrase).length).toBeGreaterThan(0)
+  })
+})
+
+describe('buildIntroLesson', () => {
+  it('puts a slide before each check, keeps option order and carries the explanation', () => {
+    for (const lesson of course.intro) {
+      const cards = buildIntroLesson(course, lesson.id)
+      const slides = cards.filter((c) => c.kind === 'slide')
+      expect(slides.length, lesson.id).toBe(lesson.slides.length)
+      lesson.slides.forEach((slide, i) => {
+        const at = cards.findIndex((c) => c.kind === 'slide' && c.slide === slide)
+        const next = cards[at + 1]
+        if (!slide.check) return expect(next?.kind !== 'choice' || !next.key.endsWith(`|q|${i}`)).toBe(true)
+        expect(next).toMatchObject({
+          kind: 'choice', key: `${lesson.id}|q|${i}`, instruction: slide.check.question,
+          answer: slide.check.answer, explain: slide.check.explain, say: slide.check.prompt,
+        })
+        expect((next as ChoiceCard).options.map((o) => o.text)).toEqual(slide.check.options)
+      })
+    }
+  })
+  it('returns nothing for an unknown lesson', () => {
+    expect(buildIntroLesson(course, 'nope')).toEqual([])
   })
 })

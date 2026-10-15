@@ -3,6 +3,7 @@ import { useProgress } from '../state/ProgressProvider'
 import { CardView } from './CardView'
 import { FeedbackPanel } from './FeedbackPanel'
 import { progressFraction } from './queue'
+import { useFlagItem } from '../teacher/useFlagItem'
 import { RunnerTop } from './RunnerTop'
 import type { Session } from './session'
 import { useRunner } from './useRunner'
@@ -36,10 +37,11 @@ function Footer(props: { r: ReturnType<typeof useRunner> }) {
 export function Runner({ session, onFinish, onExit }: RunnerProps) {
   const { progress } = useProgress()
   const r = useRunner(session, progress.settings, onFinish)
+  const flag = useFlagItem(r.card, session.id)
   if (!r.card) return null
   return (
     <div className="runner">
-      <RunnerTop fraction={progressFraction(r.state)} onExit={onExit} />
+      <RunnerTop fraction={progressFraction(r.state)} onExit={onExit} flag={flag} />
       <div className="container runner-body">
         <CardView key={r.state.index} card={r.card} locked={r.committed}
           speechMode={r.speechMode === 'server' ? 'server' : 'browser'}

@@ -18,11 +18,11 @@ export function ChoiceCard({ card, locked, onAttempt }: Props) {
   const pick = (i: number) => {
     setPicked(i)
     const correct = gradeChoice(card, i)
-    onAttempt({ results: [{ key: card.key, correct }], correct, reveal: card.options[card.answer] })
+    onAttempt({ results: [{ key: card.key, correct }], correct, reveal: card.options[card.answer], explain: card.explain })
   }
   return (
     <CardFrame title={card.instruction}>
-      <Prompt prompt={card.prompt} say={card.say} hidePrompt={card.hidePrompt} />
+      {card.prompt && <Prompt prompt={card.prompt} say={card.say} hidePrompt={card.hidePrompt} />}
       <div className="options" role="group" aria-label="Answers">
         {card.options.map((o, i) => (
           <button key={`${o.text}-${i}`} type="button" className={optionClass(i, picked, card, locked)}

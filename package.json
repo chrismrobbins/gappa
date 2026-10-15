@@ -12,7 +12,9 @@
     "voices": "tsx scripts/record-voices.ts",
     "invite": "tsx scripts/invite.ts",
     "reset-password": "tsx scripts/reset-password.ts",
-    "screens": "node scripts/screens.mjs"
+    "screens": "node scripts/screens.mjs",
+    "feedback": "tsx scripts/feedback.ts",
+    "set-role": "tsx scripts/set-role.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

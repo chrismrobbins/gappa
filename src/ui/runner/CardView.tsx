@@ -3,6 +3,7 @@ import type { Attempt } from './attempt'
 import { ChoiceCard } from './cards/ChoiceCard'
 import { MatchCard } from './cards/MatchCard'
 import { SpeakCard } from './cards/SpeakCard'
+import { SlideCard } from './cards/SlideCard'
 import { TeachCard } from './cards/TeachCard'
 import { TeachLettersCard } from './cards/TeachLettersCard'
 import { TilesCard } from './cards/TilesCard'
@@ -22,6 +23,7 @@ export function CardView({ card, locked, speechMode, onAttempt, onSkipSpeaking }
     case 'teach': return <TeachCard card={card} />
     case 'teach-letters': return <TeachLettersCard card={card} />
     case 'tip': return <TipCard card={card} />
+    case 'slide': return <SlideCard card={card} />
     case 'choice': return <ChoiceCard card={card} locked={locked} onAttempt={onAttempt} />
     case 'match': return <MatchCard card={card} locked={locked} onAttempt={onAttempt} />
     case 'tiles': return <TilesCard card={card} locked={locked} onAttempt={onAttempt} />

@@ -5,7 +5,9 @@ import { updateCard } from './cards'
 import { isLessonDone } from './unlock'
 import { accuracyOf, isPassed, sessionXp } from './xp'
 
+/** Intro checks are not vocabulary, so they never become review cards. */
 function withCards(p: Progress, input: SessionInput): Progress {
+  if (input.kind === 'intro') return p
   const cards = { ...p.cards }
   for (const r of input.results) cards[r.key] = updateCard(cards[r.key], r.correct, input.now)
   return { ...p, cards }
