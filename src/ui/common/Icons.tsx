@@ -83,3 +83,4 @@ export const XCircleIcon = (p: IconProps) => (
 export const FlagIcon = (p: IconProps) => <Svg {...p}><path d="M5 21V4m0 1h12l-2 4 2 4H5" /></Svg>
 export const PencilIcon = (p: IconProps) => <Svg {...p}><path d="M4 20l1-4L16.5 4.5a2 2 0 0 1 3 3L8 19l-4 1zM14 7l3 3" /></Svg>
 export const ArrowLeftIcon = (p: IconProps) => <Svg {...p}><path d="M19 12H5m6-6l-6 6 6 6" /></Svg>
+export const ChevronDownIcon = (p: IconProps) => <Svg {...p}><path d="M6 9l6 6 6-6" strokeWidth={2.5} /></Svg>

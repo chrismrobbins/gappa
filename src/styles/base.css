@@ -124,3 +124,6 @@ button:disabled { cursor: default; }
 }
 
 .stack { display: grid; gap: var(--space-3); }
+
+/* Author display rules (e.g. .path { display: flex }) would otherwise beat the hidden attribute. */
+[hidden] { display: none !important; }

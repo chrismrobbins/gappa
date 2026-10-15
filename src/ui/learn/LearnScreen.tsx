@@ -8,6 +8,7 @@ import type { NodeState } from './LessonNode'
 import { LessonSheet } from './LessonSheet'
 import { SectionPath } from './SectionPath'
 import { sectionsFor, type NodeInfo, type Track } from './sections'
+import { useSectionToggles } from './useSectionToggles'
 
 const TRACKS: { value: Track; label: string }[] = [
   { value: 'lessons', label: 'Lessons' },
@@ -26,12 +27,14 @@ export function LearnScreen({ track, onTrack, onStart }: LearnProps) {
   const stateOf = useNodeState()
   const [open, setOpen] = useState<NodeInfo | null>(null)
   const next = nextNode(course, progress, track)
+  const sections = useSectionToggles(next?.id ?? null)
   return (
     <div className="screen">
       <HeroCard next={next} onContinue={() => next && onStart(next)} />
       <ChipGroup<Track> label="Track" value={track} options={TRACKS} onChange={onTrack} />
       {sectionsFor(course, track).map((s) => (
-        <SectionPath key={s.id} section={s} currentId={next?.id ?? null} stateOf={stateOf} onOpen={setOpen} />
+        <SectionPath key={s.id} section={s} currentId={next?.id ?? null} open={sections.isOpen(s)}
+          onToggle={() => sections.toggle(s)} stateOf={stateOf} onOpen={setOpen} />
       ))}
       {open && (
         <LessonSheet node={open} done={isLessonDone(progress, open.id)} onClose={() => setOpen(null)}
