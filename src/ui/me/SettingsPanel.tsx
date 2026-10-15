@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { DAILY_GOALS } from '../../config'
 import type { RomanizationMode, SpeechMode } from '../../types'
 import { ChipGroup } from '../common/ChipGroup'
@@ -22,24 +23,38 @@ const ROMAN_HELP: Record<RomanizationMode, string> = {
   tap: 'Hides it until you tap "abc".',
 }
 
+function Row(props: { label: string; help?: string; children: ReactNode }) {
+  return (
+    <div className="setting-row">
+      <h3>{props.label}</h3>
+      {props.children}
+      {props.help && <p className="muted setting-help">{props.help}</p>}
+    </div>
+  )
+}
+
 export function SettingsPanel() {
   const { progress, changeSettings } = useProgress()
   const s = progress.settings
   return (
-    <section className="card settings">
-      <h2>Settings</h2>
-      <h3>Daily goal (XP)</h3>
-      <ChipGroup label="Daily goal" value={s.dailyGoal} onChange={(dailyGoal) => changeSettings({ dailyGoal })}
-        options={DAILY_GOALS.map((g) => ({ value: g, label: String(g) }))} />
-      <h3>Romanization</h3>
-      <ChipGroup label="Romanization" value={s.romanization} options={ROMAN} onChange={(romanization) => changeSettings({ romanization })} />
-      <p className="muted">{ROMAN_HELP[s.romanization]}</p>
-      <h3>Sound</h3>
-      <ChipGroup label="Sound effects" value={s.sound ? 'on' : 'off'} onChange={(v) => changeSettings({ sound: v === 'on' })}
-        options={[{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }]} />
-      <h3>Speaking practice</h3>
-      <ChipGroup label="Speaking practice" value={s.speech} options={SPEECH} onChange={(speech) => changeSettings({ speech })} />
-      <p className="muted">{SPEECH_HELP[s.speech]}</p>
+    <section className="stack">
+      <h2 className="section-title">Settings</h2>
+      <div className="card settings">
+        <Row label="Daily goal (XP)">
+          <ChipGroup label="Daily goal" value={s.dailyGoal} onChange={(dailyGoal) => changeSettings({ dailyGoal })}
+            options={DAILY_GOALS.map((g) => ({ value: g, label: String(g) }))} />
+        </Row>
+        <Row label="Romanization" help={ROMAN_HELP[s.romanization]}>
+          <ChipGroup label="Romanization" value={s.romanization} options={ROMAN} onChange={(romanization) => changeSettings({ romanization })} />
+        </Row>
+        <Row label="Sound">
+          <ChipGroup label="Sound effects" value={s.sound ? 'on' : 'off'} onChange={(v) => changeSettings({ sound: v === 'on' })}
+            options={[{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }]} />
+        </Row>
+        <Row label="Speaking practice" help={SPEECH_HELP[s.speech]}>
+          <ChipGroup label="Speaking practice" value={s.speech} options={SPEECH} onChange={(speech) => changeSettings({ speech })} />
+        </Row>
+      </div>
     </section>
   )
 }

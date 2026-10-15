@@ -22,7 +22,7 @@ function LetterRow({ letter }: { letter: Letter }) {
 
 export function TeachLettersCard({ card }: { card: Data }) {
   return (
-    <CardFrame title="New letters">
+    <CardFrame title="Listen and repeat" eyebrow="New letters">
       <ul className="teach-list">{card.letters.map((l) => <LetterRow key={l.char} letter={l} />)}</ul>
     </CardFrame>
   )

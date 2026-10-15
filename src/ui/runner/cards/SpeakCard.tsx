@@ -33,7 +33,7 @@ export function SpeakCard({ card, locked, mode, onAttempt, onSkipSpeaking }: Pro
   const label = LABELS[speech.phase]
   return (
     <CardFrame title="Say this out loud">
-      <Prompt prompt={{ text: card.item.target, rom: card.item.rom }} say={card.item.target} big />
+      <Prompt prompt={{ text: card.item.target, rom: card.item.rom }} say={card.item.target} />
       <p className="muted center">{card.item.en}</p>
       <button type="button" className={`mic${speech.phase === 'listening' ? ' is-live' : ''}`} disabled={locked}
         aria-label={label} onClick={speech.toggle}><MicIcon size={40} /></button>

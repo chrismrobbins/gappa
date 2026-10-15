@@ -45,7 +45,7 @@ export function AuthScreen() {
   const form = useAuthForm(tab)
   return (
     <main className="auth">
-      <Wordmark />
+      <Wordmark size="lg" />
       <div className="tabs" role="tablist">
         <button role="tab" type="button" aria-selected={tab === 'in'} onClick={() => setTab('in')}>Sign in</button>
         <button role="tab" type="button" aria-selected={tab === 'join'} onClick={() => setTab('join')}>Join with invite</button>

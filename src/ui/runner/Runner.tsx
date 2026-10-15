@@ -15,22 +15,22 @@ interface RunnerProps {
 
 const isExercise = (kind: string): boolean => ['choice', 'tiles'].includes(kind)
 
+function FooterButton(props: { label: string; disabled?: boolean; onClick(): void }) {
+  return (
+    <div className="footer">
+      <div className="container">
+        <button type="button" className="btn btn-primary" disabled={props.disabled} onClick={props.onClick}>{props.label}</button>
+      </div>
+    </div>
+  )
+}
+
 function Footer(props: { r: ReturnType<typeof useRunner> }) {
   const { r } = props
   if (r.committed && r.attempt) return <FeedbackPanel attempt={r.attempt} onContinue={r.next} />
-  if (r.card && isExercise(r.card.kind)) {
-    return (
-      <div className="footer">
-        <button type="button" className="btn btn-primary" disabled={!r.attempt} onClick={r.check}>Check</button>
-      </div>
-    )
-  }
+  if (r.card && isExercise(r.card.kind)) return <FooterButton label="Check" disabled={!r.attempt} onClick={r.check} />
   if (r.card && ['match', 'speak'].includes(r.card.kind)) return null
-  return (
-    <div className="footer">
-      <button type="button" className="btn btn-primary" onClick={r.next}>Continue</button>
-    </div>
-  )
+  return <FooterButton label="Continue" onClick={r.next} />
 }
 
 export function Runner({ session, onFinish, onExit }: RunnerProps) {
@@ -40,7 +40,7 @@ export function Runner({ session, onFinish, onExit }: RunnerProps) {
   return (
     <div className="runner">
       <RunnerTop fraction={progressFraction(r.state)} onExit={onExit} />
-      <div className="runner-body">
+      <div className="container runner-body">
         <CardView key={r.state.index} card={r.card} locked={r.committed}
           speechMode={r.speechMode === 'server' ? 'server' : 'browser'}
           onAttempt={r.onAttempt} onSkipSpeaking={r.skipSpeaking} />

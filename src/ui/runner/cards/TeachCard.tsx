@@ -1,5 +1,6 @@
 import type { Item, TeachCard as TeachCardData } from '../../../types'
 import { Native } from '../../common/Native'
+import { nativeSize } from '../../common/nativeSize'
 import { SoundButtons } from '../../common/SoundButtons'
 import { CardFrame } from './CardFrame'
 
@@ -16,7 +17,7 @@ function TeachRow({ item }: { item: Item }) {
   return (
     <li className="teach-item card">
       <div className="teach-main">
-        <Native text={item.target} rom={item.rom} className="native-big" />
+        <Native text={item.target} rom={item.rom} className={nativeSize(item.target)} />
         <p className="teach-en">{item.en}</p>
         <Chips item={item} />
       </div>
@@ -27,7 +28,7 @@ function TeachRow({ item }: { item: Item }) {
 
 export function TeachCard({ card }: { card: TeachCardData }) {
   return (
-    <CardFrame title={card.title}>
+    <CardFrame title={card.title} eyebrow="New word">
       <ul className="teach-list">{card.items.map((item) => <TeachRow key={item.target} item={item} />)}</ul>
     </CardFrame>
   )

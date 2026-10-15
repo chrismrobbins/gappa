@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
 import { BADGES, CHECKPOINT_PASS } from '../../config'
 import { streakInfo } from '../../lib/progress'
 import type { SessionKind, SessionOutcome } from '../../types'
-import { FlameIcon } from '../common/Icons'
+import { CheckCircleIcon, FlameIcon, StarIcon } from '../common/Icons'
+import { BadgeItem } from '../me/BadgeGrid'
 import { todayKey } from '../state/today'
 import { Confetti } from './Confetti'
 import { useCountUp } from './useCountUp'
@@ -29,40 +31,52 @@ function CheckpointNote({ info }: { info: FinishInfo }) {
   )
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return <div className="finish-stat card"><strong>{value}</strong><span>{label}</span></div>
+function Stat(props: { tone: string; icon: ReactNode; value: string; label: string }) {
+  return (
+    <div className={`fstat fstat-${props.tone}`}>
+      {props.icon}
+      <strong>{props.value}</strong>
+      <span>{props.label}</span>
+    </div>
+  )
 }
 
-function Badges({ ids }: { ids: string[] }) {
-  if (ids.length === 0) return null
+function Stats({ outcome }: { outcome: SessionOutcome }) {
+  const xp = useCountUp(outcome.xpEarned)
+  const accuracy = useCountUp(Math.round(outcome.accuracy * 100))
+  const streak = useCountUp(streakInfo(outcome.progress, todayKey()).current)
   return (
-    <div className="card">
-      <h2>New badges</h2>
-      <ul className="badge-list">
-        {ids.map((id) => <li key={id} className="badge is-earned">{BADGES.find((b) => b.id === id)?.name ?? id}</li>)}
-      </ul>
+    <div className="finish-stats">
+      <Stat tone="xp" icon={<StarIcon size={28} />} value={`+${xp}`} label="XP earned" />
+      <Stat tone="acc" icon={<CheckCircleIcon size={28} />} value={`${accuracy}%`} label="Accuracy" />
+      <Stat tone="streak" icon={<FlameIcon size={28} />} value={String(streak)} label="Day streak" />
     </div>
+  )
+}
+
+function NewBadges({ ids }: { ids: string[] }) {
+  const earned = BADGES.filter((b) => ids.includes(b.id))
+  if (earned.length === 0) return null
+  return (
+    <section className="stack">
+      <h2>New badges</h2>
+      <ul className="badge-grid">{earned.map((b) => <BadgeItem key={b.id} badge={b} earned />)}</ul>
+    </section>
   )
 }
 
 export function FinishScreen({ info, onDone }: { info: FinishInfo; onDone(): void }) {
   const { outcome } = info
-  const xp = useCountUp(outcome.xpEarned)
-  const streak = streakInfo(outcome.progress, todayKey())
   return (
     <main className="finish">
       {outcome.passed && <Confetti />}
-      <h1>{headline(info)}</h1>
-      <CheckpointNote info={info} />
-      <div className="finish-stats">
-        <Stat label="XP earned" value={`+${xp}`} />
-        <Stat label="Accuracy" value={`${Math.round(outcome.accuracy * 100)}%`} />
+      <div className="container finish-body">
+        <h1>{headline(info)}</h1>
+        <CheckpointNote info={info} />
+        <Stats outcome={outcome} />
+        <NewBadges ids={outcome.newBadges} />
+        <button type="button" className="btn btn-primary" onClick={onDone}>Continue</button>
       </div>
-      <p className="finish-streak"><FlameIcon size={24} />
-        {info.wasActiveToday ? `${streak.current} day streak` : `Day ${streak.current}!`}
-      </p>
-      <Badges ids={outcome.newBadges} />
-      <button type="button" className="btn btn-primary" onClick={onDone}>Continue</button>
     </main>
   )
 }

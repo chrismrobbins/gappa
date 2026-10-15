@@ -1,4 +1,5 @@
 import type { Item, TipCard as Data } from '../../../types'
+import { BulbIcon } from '../../common/Icons'
 import { Native } from '../../common/Native'
 import { Rich } from '../../common/Rich'
 import { SoundButtons } from '../../common/SoundButtons'
@@ -17,7 +18,7 @@ function Example({ item }: { item: Item }) {
 export function TipCard({ card }: { card: Data }) {
   const { tip } = card
   return (
-    <CardFrame title={tip.title} eyebrow="Tip">
+    <CardFrame title={tip.title} eyebrow="Tip" icon={<BulbIcon size={16} />} className="is-tip">
       {tip.body.map((para) => <p key={para} className="tip-para"><Rich text={para} /></p>)}
       {tip.examples?.map((ex) => <Example key={ex.target} item={ex} />)}
     </CardFrame>

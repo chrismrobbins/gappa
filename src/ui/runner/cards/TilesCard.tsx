@@ -13,6 +13,10 @@ function toAttempt(card: Data, picked: number[]): Attempt | null {
   return { results: [{ key: card.key, correct }], correct, reveal: tilesAnswer(card) }
 }
 
+function TileText({ tile }: { tile: Data['tiles'][number] }) {
+  return <Native text={tile.text} rom={tile.rom} tappable={false} />
+}
+
 export function TilesCard({ card, locked, onAttempt }: Props) {
   const [picked, setPicked] = useState<number[]>([])
   const update = (next: number[]) => { setPicked(next); onAttempt(toAttempt(card, next)) }
@@ -24,17 +28,14 @@ export function TilesCard({ card, locked, onAttempt }: Props) {
       <div className="answer-area" aria-label="Your answer">
         {picked.map((i) => (
           <button key={i} type="button" className="tile" disabled={locked} onClick={() => remove(i)}>
-            <Native text={card.tiles[i].text} rom={card.tiles[i].rom} tappable={false} />
+            <TileText tile={card.tiles[i]} />
           </button>
         ))}
       </div>
       <div className="tile-bank">
-        {card.tiles.map((t, i) => (
-          <button key={i} type="button" className="tile" disabled={locked || picked.includes(i)}
-            hidden={picked.includes(i)} onClick={() => add(i)}>
-            <Native text={t.text} rom={t.rom} tappable={false} />
-          </button>
-        ))}
+        {card.tiles.map((t, i) => picked.includes(i)
+          ? <span key={i} className="tile-ghost" aria-hidden="true"><TileText tile={t} /></span>
+          : <button key={i} type="button" className="tile" disabled={locked} onClick={() => add(i)}><TileText tile={t} /></button>)}
       </div>
     </CardFrame>
   )

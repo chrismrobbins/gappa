@@ -1,10 +1,10 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 
-interface IconProps { size?: number; className?: string }
+export interface IconProps { size?: number; className?: string; style?: CSSProperties }
 
-function Svg({ size = 24, className, children }: IconProps & { children: ReactNode }) {
+function Svg({ size = 24, className, style, children }: IconProps & { children: ReactNode }) {
   return (
-    <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg className={className} style={style} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {children}
     </svg>
@@ -42,4 +42,41 @@ export const SnowflakeIcon = (p: IconProps) => (
 )
 export const StarIcon = (p: IconProps) => (
   <Svg {...p}><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8 6.6 19.7l1.1-6.1L3.2 9.4l6.1-.8z" fill="currentColor" /></Svg>
+)
+
+export const TrophyIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M7 4h10v5a5 5 0 0 1-10 0z" fill="currentColor" />
+    <path d="M7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9 18h6" />
+  </Svg>
+)
+export const BulbIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="currentColor" />
+    <path d="M10 19h4M10.5 21.5h3" />
+  </Svg>
+)
+
+const PETAL_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315]
+
+/** Eight-petal marigold flower, used as path decoration and as a badge/empty-state icon. */
+export const FlowerIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <g fill="currentColor" stroke="none">
+      {PETAL_ANGLES.map((a) => <ellipse key={a} cx="12" cy="6" rx="2.6" ry="4.2" transform={`rotate(${a} 12 12)`} />)}
+    </g>
+    <circle cx="12" cy="12" r="3" fill="var(--turmeric)" stroke="none" />
+  </Svg>
+)
+export const CheckCircleIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="10.5" fill="currentColor" stroke="none" />
+    <path d="M7 12.5l3.5 3.5L17 9" stroke="var(--surface)" strokeWidth={3} />
+  </Svg>
+)
+export const XCircleIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="10.5" fill="currentColor" stroke="none" />
+    <path d="M8 8l8 8M16 8l-8 8" stroke="var(--surface)" strokeWidth={3} />
+  </Svg>
 )

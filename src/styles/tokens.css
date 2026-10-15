@@ -8,22 +8,40 @@
   --ink: #2b1d14;
   --muted: #7a6656;
   --line: #eadfcb;
+  --line-strong: #d8c7a6;
 
   --marigold: #f59e0b;
   --marigold-ink: #9a5b00;
   --marigold-soft: #fde7bf;
   --peacock: #0f766e;
   --peacock-soft: #d3efe9;
+  --indigo-soft: #e1e5fb;
   --kumkum: #c2263b;
   --kumkum-soft: #f9dade;
   --turmeric: #f2c230;
   --indigo: #3b4ba8;
+  --streak: #ea6a0c;
+  --streak-soft: #ffe4cf;
+
+  /* Face + edge pairs for 3D controls. Constant in both themes so white/dark text on them always reads. */
+  --on-color: #ffffff;
+  --on-marigold: #2b1d14;
+  --marigold-edge: #c27a00;
+  --turmeric-edge: #b8901a;
+  --peacock-deep: #0f766e;
+  --peacock-edge: #0a524c;
+  --kumkum-deep: #c2263b;
+  --kumkum-edge: #861828;
+  --indigo-deep: #3b4ba8;
+  --indigo-edge: #28357a;
+  --saffron-deep: #9a5b00;
+  --saffron-edge: #6b3f00;
 
   --correct: var(--peacock);
   --correct-soft: var(--peacock-soft);
   --wrong: var(--kumkum);
   --wrong-soft: var(--kumkum-soft);
-  --streak: #ea6a0c;
+  --dot: color-mix(in srgb, var(--marigold) 7%, transparent);
 
   --font-display: 'Baloo 2', 'Mukta', system-ui, sans-serif;
   --font-body: 'Mukta', system-ui, -apple-system, sans-serif;
@@ -33,7 +51,11 @@
   --text-lg: 1.25rem;
   --text-xl: 1.6rem;
   --text-2xl: 2.2rem;
+  --text-instruction: 1.45rem;
+  --text-native-hero: 2.6rem;
   --text-native: 1.9rem;
+  --text-option: 1.3rem;
+  --text-rom: 0.85rem;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -48,11 +70,13 @@
   --r-pill: 999px;
 
   --scrim: rgb(0 0 0 / 0.45);
-  --shadow-press: 0 4px 0 var(--line);
   --shadow-card: 0 2px 10px rgb(43 29 20 / 0.08);
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --depth: 4px;
+  --ease: cubic-bezier(0.34, 1.4, 0.5, 1);
   --dur: 180ms;
-  --max-width: 560px;
+  --max-width: 600px;
+  --sidebar-width: 240px;
+  --node-size: 80px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -64,16 +88,22 @@
     --ink: #f8ebdd;
     --muted: #bfa894;
     --line: #3a2b20;
+    --line-strong: #52402f;
     --marigold: #f7a928;
     --marigold-ink: #ffd28a;
     --marigold-soft: #4a3312;
     --peacock: #2db3a6;
     --peacock-soft: #123a35;
+    --indigo-soft: #222850;
     --kumkum: #f0566a;
     --kumkum-soft: #46161e;
     --turmeric: #f5cf55;
     --indigo: #8b9bff;
     --streak: #ff8a3d;
+    --streak-soft: #4a2a14;
+    --peacock-deep: #138a7d;
+    --peacock-edge: #0b5c54;
     --shadow-card: 0 2px 10px rgb(0 0 0 / 0.35);
+    --dot: color-mix(in srgb, var(--marigold) 6%, transparent);
   }
 }

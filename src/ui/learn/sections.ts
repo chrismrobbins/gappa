@@ -10,10 +10,15 @@ export interface NodeInfo {
   tipTitle?: string
   words: number
   phrases: number
+  /** First letter of a script lesson, shown on its path node. */
+  glyph?: string
 }
 
 export interface Section {
   id: string
+  eyebrow: string
+  /** Picks the banner color (`tone-<tone>` in learn.css). */
+  tone: string
   title: string
   nativeTitle?: string
   nodes: NodeInfo[]
@@ -21,7 +26,7 @@ export interface Section {
 
 const scriptNode = (s: ScriptLesson): NodeInfo => ({
   id: s.id, kind: 'script', title: s.title, blurb: s.note ?? 'Learn to read and say these letters.',
-  words: s.letters.length, phrases: 0,
+  words: s.letters.length, phrases: 0, glyph: s.letters[0]?.char,
 })
 
 const lessonNode = (l: Lesson): NodeInfo => ({
@@ -34,14 +39,16 @@ const checkpointNode = (u: Unit): NodeInfo => ({
   blurb: `${CHECKPOINT_SIZE} questions from ${u.title}. Pass to earn bonus XP.`, words: 0, phrases: 0,
 })
 
-const unitSection = (u: Unit): Section => ({
-  id: u.id, title: u.title, nativeTitle: u.nativeTitle, nodes: [...u.lessons.map(lessonNode), checkpointNode(u)],
+const UNIT_TONES = 4
+
+const unitSection = (u: Unit, i: number): Section => ({
+  id: u.id, eyebrow: `Unit ${i + 1}`, tone: `u${(i % UNIT_TONES) + 1}`, title: u.title, nativeTitle: u.nativeTitle, nodes: [...u.lessons.map(lessonNode), checkpointNode(u)],
 })
 
 export type Track = 'lessons' | 'letters'
 
 const lettersSection = (c: Course): Section => ({
-  id: 'script', title: 'Letters', nativeTitle: 'अक्षरं', nodes: c.script.map(scriptNode),
+  id: 'script', eyebrow: 'The script', tone: 'letters', title: 'Letters', nativeTitle: 'अक्षरं', nodes: c.script.map(scriptNode),
 })
 
 /** The sections shown on the Learn screen for one track. */
