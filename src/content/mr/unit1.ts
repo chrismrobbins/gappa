@@ -16,7 +16,7 @@ export const unit1: Unit = {
         title: 'Polite or close',
         body: [
           'Marathi changes its words depending on who you are talking to.',
-          '**कसे आहात?** is polite: use it with elders, strangers and her parents.',
+          '**कसे आहात?** is polite: use it with elders, strangers and your partner’s parents.',
           'With a close friend it depends on them: **कसा आहेस?** to a man, **कशी आहेस?** to a woman.',
         ],
         examples: [

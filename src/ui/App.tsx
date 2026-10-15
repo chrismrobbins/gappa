@@ -6,6 +6,7 @@ import type { ExerciseResult } from '../types'
 import { AuthScreen } from './auth/AuthScreen'
 import { FinishScreen, type FinishInfo } from './finish/FinishScreen'
 import { LearnScreen } from './learn/LearnScreen'
+import type { Track } from './learn/sections'
 import { MeScreen } from './me/MeScreen'
 import { ReviewScreen } from './review/ReviewScreen'
 import { Runner } from './runner/Runner'
@@ -18,11 +19,13 @@ import { useAuth } from './state/useAuth'
 
 type View = { name: 'tabs' } | { name: 'run'; session: Session } | { name: 'finish'; info: FinishInfo }
 
-function Tabs(props: { tab: Tab; onTab(t: Tab): void; onSession(s: Session): void }) {
+interface TabsProps { tab: Tab; onTab(t: Tab): void; track: Track; onTrack(t: Track): void; onSession(s: Session): void }
+
+function Tabs(props: TabsProps) {
   const { course } = useProgress()
   return (
     <Shell tab={props.tab} onTab={props.onTab}>
-      {props.tab === 'learn' && <LearnScreen onStart={(n) => props.onSession(startSession(course, n.kind, n.id))} />}
+      {props.tab === 'learn' && <LearnScreen track={props.track} onTrack={props.onTrack} onStart={(n) => props.onSession(startSession(course, n.kind, n.id))} />}
       {props.tab === 'review' && <ReviewScreen onStart={(keys) => props.onSession(reviewSession(course, keys))} />}
       {props.tab === 'me' && <MeScreen />}
     </Shell>
@@ -42,6 +45,7 @@ function useFinish(): (session: Session, results: ExerciseResult[]) => FinishInf
 
 function Home() {
   const [tab, setTab] = useState<Tab>('learn')
+  const [track, setTrack] = useState<Track>('lessons')
   const [view, setView] = useState<View>({ name: 'tabs' })
   const finish = useFinish()
   const toTabs = () => setView({ name: 'tabs' })
@@ -53,7 +57,7 @@ function Home() {
     return <Runner session={view.session} onExit={toTabs} onFinish={onFinish} />
   }
   if (view.name === 'finish') return <FinishScreen info={view.info} onDone={toTabs} />
-  return <Tabs tab={tab} onTab={setTab} onSession={run} />
+  return <Tabs tab={tab} onTab={setTab} track={track} onTrack={setTrack} onSession={run} />
 }
 
 export function App() {

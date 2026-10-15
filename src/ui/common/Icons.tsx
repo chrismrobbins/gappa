@@ -12,7 +12,7 @@ function Svg({ size = 24, className, children }: IconProps & { children: ReactNo
 }
 
 export const FlameIcon = (p: IconProps) => (
-  <Svg {...p}><path d="M12 3c1 4 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.2 1 2 2 2 0-3-1-5 1-8z" fill="currentColor" /></Svg>
+  <Svg {...p}><path d="M12.5 2c.6 3.4 3.1 5.2 4.6 7.6 1.9 3 1.6 7-1.1 9.3a6 6 0 0 1-8.2-.3c-2.3-2.4-2.2-6-.3-8.5.4 1.7 1.4 2.8 2.7 3.2-.7-4.3.6-8.3 2.3-11.3z" fill="currentColor" stroke="none" /></Svg>
 )
 export const CheckIcon = (p: IconProps) => <Svg {...p}><path d="M5 12.5l4.5 4.5L19 7.5" strokeWidth={3} /></Svg>
 export const LockIcon = (p: IconProps) => (

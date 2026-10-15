@@ -38,9 +38,15 @@ const unitSection = (u: Unit): Section => ({
   id: u.id, title: u.title, nativeTitle: u.nativeTitle, nodes: [...u.lessons.map(lessonNode), checkpointNode(u)],
 })
 
-export function learnSections(course: Course): Section[] {
-  const letters: Section = { id: 'script', title: 'Letters', nativeTitle: 'अक्षरं', nodes: course.script.map(scriptNode) }
-  return [letters, ...course.units.map(unitSection)]
+export type Track = 'lessons' | 'letters'
+
+const lettersSection = (c: Course): Section => ({
+  id: 'script', title: 'Letters', nativeTitle: 'अक्षरं', nodes: c.script.map(scriptNode),
+})
+
+/** The sections shown on the Learn screen for one track. */
+export function sectionsFor(course: Course, track: Track): Section[] {
+  return track === 'letters' ? [lettersSection(course)] : course.units.map(unitSection)
 }
 
 /** Counts line shown in the lesson sheet. */

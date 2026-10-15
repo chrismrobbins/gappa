@@ -3,9 +3,15 @@ import { isLessonDone, isUnlocked } from '../../lib/progress'
 import { useProgress } from '../state/ProgressProvider'
 import { LessonNode, type NodeState } from './LessonNode'
 import { LessonSheet } from './LessonSheet'
-import { learnSections, type NodeInfo, type Section } from './sections'
+import { ChipGroup } from '../common/ChipGroup'
+import { sectionsFor, type NodeInfo, type Section, type Track } from './sections'
 
-interface LearnProps { onStart(node: NodeInfo): void }
+const TRACKS: { value: Track; label: string }[] = [
+  { value: 'lessons', label: 'Lessons' },
+  { value: 'letters', label: 'अक्षरं · Letters' },
+]
+
+interface LearnProps { track: Track; onTrack(t: Track): void; onStart(node: NodeInfo): void }
 
 function useNodeState(): (id: string) => NodeState {
   const { progress, course } = useProgress()
@@ -29,14 +35,15 @@ function SectionPath(props: { section: Section; stateOf(id: string): NodeState; 
   )
 }
 
-export function LearnScreen({ onStart }: LearnProps) {
+export function LearnScreen({ track, onTrack, onStart }: LearnProps) {
   const { course, username, progress } = useProgress()
   const stateOf = useNodeState()
   const [open, setOpen] = useState<NodeInfo | null>(null)
   return (
     <div className="screen">
       <h1 className="greeting"><span lang="mr">नमस्कार</span>{username ? `, ${username}!` : '!'}</h1>
-      {learnSections(course).map((s) => (
+      <ChipGroup<Track> label="Track" value={track} options={TRACKS} onChange={onTrack} />
+      {sectionsFor(course, track).map((s) => (
         <SectionPath key={s.id} section={s} stateOf={stateOf} onOpen={setOpen} />
       ))}
       {open && (

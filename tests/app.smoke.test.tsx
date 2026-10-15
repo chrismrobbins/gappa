@@ -65,6 +65,7 @@ describe('app smoke test (local mode)', () => {
   it('plays the first letters lesson to the finish screen, awards XP and saves it', async () => {
     const { App } = await import('../src/ui/App')
     render(<App />)
+    fireEvent.click(screen.getByRole('button', { name: 'अक्षरं · Letters' }))
     fireEvent.click(screen.getByRole('button', { name: /^Vowels I, unlocked$/ }))
     fireEvent.click(screen.getByRole('button', { name: 'Start' }))
     playToFinish()
