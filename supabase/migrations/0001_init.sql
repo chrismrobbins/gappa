@@ -29,6 +29,13 @@ revoke all on table public.invite_codes from anon, authenticated;
 -- Signed-out visitors never touch user tables.
 revoke all on table public.profiles, public.progress from anon;
 
+-- Explicit grants, so the schema works with "Automatically expose new tables" turned off.
+-- RLS policies below still limit signed-in users to their own rows.
+grant select on table public.profiles to authenticated;
+grant select, insert, update on table public.progress to authenticated;
+-- Server-side code (signup API, invite and reset scripts) uses the service role.
+grant all on table public.profiles, public.progress, public.invite_codes to service_role;
+
 create policy "profiles: read own" on public.profiles
   for select to authenticated using ((select auth.uid()) = id);
 
