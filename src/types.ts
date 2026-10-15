@@ -134,11 +134,23 @@ export interface ExerciseResult {
 export type RomanizationMode = 'auto' | 'always' | 'tap'
 export type SpeechMode = 'auto' | 'browser' | 'server' | 'off'
 
+/** 'mix' = a random recorded voice per line, else a VoiceDef id. */
+export type VoicePref = 'mix' | string
+
+export interface VoiceDef {
+  id: string
+  name: string
+  gender: 'female' | 'male'
+  /** ElevenLabs voice id used by the recorder. */
+  elevenLabsId: string
+}
+
 export interface Settings {
   dailyGoal: number
   romanization: RomanizationMode
   sound: boolean
   speech: SpeechMode
+  voice: VoicePref
   updatedAt: number
 }
 

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
-import { DAILY_GOALS } from '../../config'
+import { DAILY_GOALS, VOICES } from '../../config'
 import type { RomanizationMode, SpeechMode } from '../../types'
+import { previewVoice } from '../../services/audio'
 import { ChipGroup } from '../common/ChipGroup'
 import { useProgress } from '../state/ProgressProvider'
 
@@ -11,6 +12,7 @@ const SPEECH: { value: SpeechMode; label: string }[] = [
   { value: 'auto', label: 'Auto' }, { value: 'browser', label: 'Browser' },
   { value: 'server', label: 'Server' }, { value: 'off', label: 'Off' },
 ]
+const VOICE_OPTIONS = [{ value: 'mix', label: 'Mix' }, ...VOICES.map((v) => ({ value: v.id, label: v.name }))]
 const SPEECH_HELP: Record<SpeechMode, string> = {
   auto: 'Picks the best way to hear you on this device.',
   browser: 'Uses your browser to listen. Works best in desktop Chrome.',
@@ -46,6 +48,10 @@ export function SettingsPanel() {
         </Row>
         <Row label="Romanization" help={ROMAN_HELP[s.romanization]}>
           <ChipGroup label="Romanization" value={s.romanization} options={ROMAN} onChange={(romanization) => changeSettings({ romanization })} />
+        </Row>
+        <Row label="Voice" help="Mix plays each line in a different voice to train your ear.">
+          <ChipGroup label="Voice" value={s.voice} options={VOICE_OPTIONS}
+            onChange={(voice) => { changeSettings({ voice }); previewVoice(voice) }} />
         </Row>
         <Row label="Sound">
           <ChipGroup label="Sound effects" value={s.sound ? 'on' : 'off'} onChange={(v) => changeSettings({ sound: v === 'on' })}

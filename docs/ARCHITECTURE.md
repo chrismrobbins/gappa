@@ -27,6 +27,7 @@ accounts and progress in Supabase, voices pre-recorded with ElevenLabs.
 | `src/lib/text.ts` | lead | `normalize`, `tokens`, `displayTokens`, `levenshtein`, `similarity` |
 | `src/lib/audioKey.ts` | lead | `canonicalLine`, `audioKey` (shared with the recorder) |
 | `src/lib/random.ts` | lead | `seededRng`, `shuffle`, `sample`, `pickOne` |
+| `src/lib/voicePick.ts` | services | Pure `pickVoice` (preferred / mix / any recorded voice) |
 | `src/content/**` | lead | Course data only (`COURSES`, `DEFAULT_LANG`, `getCourse`) |
 | `src/lib/username.ts` | services | Username normalization, email mapping and form rules (shared with `api/signup`) |
 | `src/lib/speechMode.ts` | services | Pure speech-mode decision (`resolveMode`) |
@@ -136,8 +137,10 @@ onAuthChange(cb: (username: string | null) => void): () => void
 // sync.ts
 pullProgress(): Promise<Progress | null> ; pushProgress(p: Progress): Promise<void>
 // audio.ts
-loadVoiceIndex(lang: LangId): Promise<void>
-say(text: string, opts?: { slow?: boolean; lang?: LangId }): void   // recorded clip, else device voice
+loadVoiceIndex(lang: LangId): Promise<void>                  // every voice's index
+setVoicePreference(pref: VoicePref): void
+previewVoice(pref: VoicePref): void
+say(text: string, opts?: { slow?: boolean; lang?: LangId }): void   // recorded clip (chosen voice), else device voice
 // speech.ts
 resolveSpeechMode(setting: SpeechMode): 'browser' | 'server' | 'off'
 startListening(lang: LangId, mode: 'browser' | 'server'): Listener
@@ -148,13 +151,20 @@ sfx(name: 'correct' | 'wrong' | 'finish' | 'tap'): void
 
 ## Recorded voices
 
-`npm run voices` (scripts/record-voices.ts) collects every line the course can say (words,
-phrases, tip examples, letters and letter examples), records missing ones with ElevenLabs into
-`public/audio/<lang>/<audioKey>.mp3`, and writes `public/audio/<lang>/index.json` (array of keys).
-It tracks monthly character use in `scripts/voice-usage.json` and refuses to exceed
-`ELEVENLABS_MONTHLY_CAP`. `--dry` only counts. The app plays a clip if its key is in the index,
-otherwise the device voice (`mr-IN`, then `hi-IN`). Slow playback uses `playbackRate`, never a second
-recording.
+The course is recorded in every voice in `VOICES` (`src/config.ts`: id, name, gender, ElevenLabs id).
+`npm run voices` (scripts/record-voices.ts) collects every line the course can say (words, phrases,
+tip examples, letters and letter examples), records missing ones with ElevenLabs into
+`public/audio/<lang>/<voiceId>/<audioKey>.mp3`, and writes `public/audio/<lang>/<voiceId>/index.json`
+(array of keys) per voice. `--voice <id>` records one voice; `--dry` only counts (per voice, total,
+budget left). Monthly character use across all voices is tracked in `scripts/voice-usage.json` and
+capped by `ELEVENLABS_MONTHLY_CAP`. To add a voice: new entry in `VOICES`, then `--voice <id>`.
+
+`Settings.voice` is `'mix'` (default) or a voice id. `ProgressProvider` pushes it into the audio
+service (`setVoicePreference`), so `say()` callers never pass it. `say()` asks the pure
+`pickVoice(pref, available, rng)` (`src/lib/voicePick.ts`): the preferred voice if it has the clip,
+otherwise a random voice that does ('mix' always picks randomly, so an unknown saved id also works);
+with no recorded clip it falls back to the device voice (`mr-IN`, then `hi-IN`). Settings previews a
+voice with `previewVoice(pref)`. Slow playback uses `playbackRate`, never a second recording.
 
 ## Speech input
 

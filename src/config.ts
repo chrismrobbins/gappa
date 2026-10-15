@@ -1,6 +1,6 @@
 // Game tuning lives here as data, never as literals in screens or logic.
 
-import type { BadgeDef } from './types'
+import type { BadgeDef, VoiceDef, VoicePref } from './types'
 
 export const XP = {
   lesson: 10,
@@ -52,3 +52,12 @@ export const BADGES: BadgeDef[] = [
   { id: 'unit', name: 'Unit done', description: 'Finish every lesson in a unit' },
   { id: 'checkpoint', name: 'Checkpoint', description: 'Pass a unit checkpoint' },
 ]
+
+/** Recorded voices. Adding one here + `npm run voices -- --voice <id>` is all a new voice needs. */
+export const VOICES: VoiceDef[] = [
+  { id: 'prajakta', name: 'Prajakta', gender: 'female', elevenLabsId: '4QmRQP2RqsuTD7HT9MkW' },
+  { id: 'vinayak', name: 'Vinayak', gender: 'male', elevenLabsId: 'rXW8MF4nX2gHMvBmCDnr' },
+]
+export const DEFAULT_VOICE: VoicePref = 'mix'
+/** Played when the learner picks a voice; part of the course, so already recorded. */
+export const VOICE_PREVIEW_LINE = 'मला थोडं मराठी येतं.'

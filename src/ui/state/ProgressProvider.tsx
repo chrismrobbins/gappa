@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { DEFAULT_LANG, getCourse } from '../../content'
 import { recordSession, updateSettings } from '../../lib/progress'
-import { loadVoiceIndex } from '../../services/audio'
+import { loadVoiceIndex, setVoicePreference } from '../../services/audio'
 import { signOut as authSignOut } from '../../services/auth'
 import type { Course, Progress, SessionInput, SessionOutcome, Settings } from '../../types'
 import { useProgressStore } from './useProgressStore'
@@ -26,6 +26,8 @@ export function ProgressProvider(props: { cloud: boolean; username: string | nul
   const latest = useRef(progress)
   latest.current = progress
   useEffect(() => void loadVoiceIndex(course.lang), [])
+  const voice = progress.settings.voice
+  useEffect(() => setVoicePreference(voice), [voice])
 
   const finishSession = useCallback((input: SessionInput) => {
     const outcome = recordSession(latest.current, input, course)

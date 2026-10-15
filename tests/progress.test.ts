@@ -133,7 +133,7 @@ describe('merge', () => {
 describe('settings', () => {
   it('has defaults and patches with a timestamp', () => {
     const p = emptyProgress(1)
-    expect(p.settings).toEqual({ dailyGoal: 20, romanization: 'auto', sound: true, speech: 'auto', updatedAt: 1 })
+    expect(p.settings).toEqual({ dailyGoal: 20, romanization: 'auto', sound: true, speech: 'auto', voice: 'mix', updatedAt: 1 })
     const q = updateSettings(p, { dailyGoal: 30 }, 9)
     expect(q.settings).toMatchObject({ dailyGoal: 30, sound: true, updatedAt: 9 })
     expect(p.settings.dailyGoal).toBe(20)
@@ -231,5 +231,21 @@ describe('asProgress', () => {
     expect(asProgress({ ...p, schema: 2 })).toBeNull()
     expect(asProgress({ schema: 1 })).toBeNull()
     expect(asProgress('nope')).toBeNull()
+  })
+})
+
+describe('voice setting', () => {
+  it('defaults to mix, and old saves without voice get the default', () => {
+    const p = emptyProgress(0)
+    expect(p.settings.voice).toBe('mix')
+    const { voice: _voice, ...oldSettings } = p.settings
+    const old = asProgress({ ...p, settings: oldSettings })
+    expect(old?.settings.voice).toBe('mix')
+    const merged = mergeProgress(old ?? p, emptyProgress(5))
+    expect(merged.settings.voice).toBe('mix')
+  })
+  it('keeps a saved voice id', () => {
+    const p = updateSettings(emptyProgress(0), { voice: 'vinayak' }, 1)
+    expect(asProgress(JSON.parse(JSON.stringify(p)))?.settings.voice).toBe('vinayak')
   })
 })

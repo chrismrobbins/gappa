@@ -41,7 +41,6 @@ npm run build      # typecheck + production build into dist/
 | `SUPABASE_ANON_KEY` | server | `anon` key (verifies sessions in `/api/transcribe`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | server + scripts | `service_role` key. **Never** prefix with `VITE_` |
 | `ELEVENLABS_API_KEY` | server + scripts | ElevenLabs API key |
-| `ELEVENLABS_VOICE_ID` | scripts | Voice used for recordings |
 | `ELEVENLABS_TTS_MODEL` / `ELEVENLABS_STT_MODEL` | optional | Defaults `eleven_v3` / `scribe_v1` |
 | `ELEVENLABS_MONTHLY_CAP` | scripts | Character budget per month (default 28000) |
 
@@ -71,18 +70,22 @@ These use `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from `.env`.
 
 ## Recording voices
 
-The recorder collects every line the course can say, records only the missing ones into
-`public/audio/<lang>/<key>.mp3`, and rewrites `public/audio/<lang>/index.json`. It tracks usage in
-`scripts/voice-usage.json` and stops at `ELEVENLABS_MONTHLY_CAP`.
+The course is recorded in every voice listed in `VOICES` (`src/config.ts`). The recorder collects every
+line the course can say, records only the missing ones into `public/audio/<lang>/<voiceId>/<key>.mp3`,
+and rewrites each voice's `index.json`. It tracks usage in `scripts/voice-usage.json` and stops at
+`ELEVENLABS_MONTHLY_CAP` (the cap covers all voices together).
 
 ```sh
-# 1. Pick a voice: saves one sample per voice into scripts/auditions/ (git-ignored)
-npm run voices -- --audition "नमस्कार, कसे आहात?" --voices <voiceId1>,<voiceId2>
-# 2. Put the chosen id in ELEVENLABS_VOICE_ID, then check the cost
+# Audition: saves one sample per raw ElevenLabs voice id into scripts/auditions/ (git-ignored)
+npm run voices -- --audition "नमस्कार, कसे आहात?" --voices <elevenLabsId1>,<elevenLabsId2>
+# Check the cost per voice and the total
 npm run voices -- --dry
-# 3. Record for real, and commit public/audio/ and scripts/voice-usage.json
+# Record every voice (or just one with --voice <id>); commit public/audio/ and scripts/voice-usage.json
 npm run voices
 ```
 
-Lines without a recording fall back to the device's Marathi (or Hindi) voice. After changing voices,
-delete `public/audio/mr/` and record again.
+To add a voice: add an entry to `VOICES` in `src/config.ts`, then run `npm run voices -- --voice <id>`.
+Learners pick a voice or "Mix" (a random recorded voice per line) in Me → Settings.
+
+Lines without a recording fall back to the device's Marathi (or Hindi) voice. To re-record a voice, delete
+`public/audio/mr/<voiceId>/` and run it again.
