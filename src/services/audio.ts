@@ -12,6 +12,11 @@ const SLOW_SPEECH_RATE = 0.6
 const recorded = new Map<LangId, Map<string, Set<string>>>()
 let player: HTMLAudioElement | null = null
 let preference: VoicePref = DEFAULT_VOICE
+let unlocked = false
+
+/** 50 ms of silence (8 kHz 8-bit WAV, verified with afinfo), played once inside a user gesture to unlock the shared element on iOS. */
+const SILENT_CLIP =
+  'data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA'
 
 export function setVoicePreference(pref: VoicePref): void {
   preference = pref
@@ -97,4 +102,30 @@ export function sayWithVoice(text: string, voiceId: string, lang: LangId = DEFAU
   stopAll()
   playClip(lang, voiceId, key, false)
   return true
+}
+
+function unlockElement(): void {
+  player ??= new Audio()
+  player.src = SILENT_CLIP
+  const started = player.play()
+  void Promise.resolve(started).then(() => player?.pause()).catch(() => undefined)
+}
+
+function unlockSpeech(): void {
+  if (!('speechSynthesis' in window)) return
+  const utterance = new SpeechSynthesisUtterance('')
+  utterance.volume = 0
+  window.speechSynthesis.speak(utterance)
+}
+
+/**
+ * Call synchronously inside a tap that starts a session. iOS only allows media started in a user gesture,
+ * so this primes the shared audio element and speechSynthesis, letting later autoplay from effects work.
+ * Idempotent and never throws.
+ */
+export function unlockAudio(): void {
+  if (unlocked) return
+  unlocked = true
+  try { unlockElement() } catch { /* audio unavailable */ }
+  try { unlockSpeech() } catch { /* speech unavailable */ }
 }

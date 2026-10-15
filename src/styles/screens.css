@@ -96,3 +96,4 @@
 .setting-row + .setting-row { border-top: 2px solid var(--line); }
 .setting-help { flex-basis: 100%; margin: 0; font-size: var(--text-sm); }
 .setting-row .chip { min-height: 40px; padding: 0 var(--space-3); }
+.setting-btn { min-height: 44px; padding: 0 var(--space-4); }

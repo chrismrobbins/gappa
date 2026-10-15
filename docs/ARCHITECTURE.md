@@ -95,6 +95,15 @@ the local one; pushing (debounced, and flushed when the app is hidden or before 
 after a pull has succeeded, because a push replaces the cloud row. An offline start stays local-only
 and retries the pull on the `online` event.
 
+**Offline** (`public/sw.js`, registered by `src/services/offline.ts` in production only): a
+hand-written service worker, bump `VERSION` to drop old caches. Navigations are network-first (3 s
+timeout) falling back to the cached `/index.html`; `/assets/*` and `.mp3` clips are cache-first
+(clips are served as 206 slices when Safari sends a `Range`); `index.json`, icons, manifest and Google
+Fonts are stale-while-revalidate. Never intercepted: non-GET, `/api/*`, and any other origin (Supabase).
+"Download all lessons" posts clip urls (`src/lib/offlineClips.ts`) to the worker, which caches them
+in batches and reports progress. `/sw.js` is served `no-cache`; the CSP `connect-src` allows the
+font hosts because worker fetches follow the worker's CSP.
+
 **Merge** (`mergeProgress`): days → max of each field; lessons → max `count`, max
 `bestAccuracy`, min `completedAt`; cards → newer `updatedAt` wins; badges → union (earliest ts);
 settings → newer `updatedAt` wins.
@@ -163,6 +172,7 @@ interface Listener { stop(): Promise<string>; cancel(): void }
 fetchMyRole(): Promise<Role> ; fetchMyReviews(): Promise<Review[]> ; saveReview(input: ReviewInput): Promise<Review>
 fetchAllOpenFixes(): Promise<OpenFix[]> ; resolveReview(id: string): Promise<void>      // admin
 listProfiles(): Promise<ProfileRow[]> ; setRole(username: string, role: Role): Promise<void>   // admin
+// audio.ts also: unlockAudio(): void   // idempotent iOS unlock; App's session opener calls it synchronously in the tap
 // audio.ts also: sayWithVoice(text, voiceId, lang?): boolean   // one specific voice's clip; false if not recorded
 // sfx.ts
 sfx(name: 'correct' | 'wrong' | 'finish' | 'tap'): void

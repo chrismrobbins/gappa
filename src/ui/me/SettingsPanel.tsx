@@ -3,6 +3,7 @@ import { DAILY_GOALS, VOICES } from '../../config'
 import type { RomanizationMode, SpeechMode } from '../../types'
 import { previewVoice } from '../../services/audio'
 import { ChipGroup } from '../common/ChipGroup'
+import { OfflineRow } from './OfflineRow'
 import { useProgress } from '../state/ProgressProvider'
 
 const ROMAN: { value: RomanizationMode; label: string }[] = [
@@ -52,6 +53,9 @@ export function SettingsPanel() {
         <Row label="Voice" help="Mix plays each line in a different voice to train your ear.">
           <ChipGroup label="Voice" value={s.voice} options={VOICE_OPTIONS}
             onChange={(voice) => { changeSettings({ voice }); previewVoice(voice) }} />
+        </Row>
+        <Row label="Offline audio">
+          <OfflineRow voicePref={s.voice} />
         </Row>
         <Row label="Sound">
           <ChipGroup label="Sound effects" value={s.sound ? 'on' : 'off'} onChange={(v) => changeSettings({ sound: v === 'on' })}

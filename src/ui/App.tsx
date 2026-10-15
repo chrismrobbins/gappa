@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { streakInfo } from '../lib/progress'
+import { unlockAudio } from '../services/audio'
 import { sfx } from '../services/sfx'
 import { cloudEnabled } from '../services/supabase'
 import type { ExerciseResult } from '../types'
@@ -58,7 +59,7 @@ function Home() {
   const toTabs = () => setView({ name: 'tabs' })
   useScrollTopOn(view)
   // A session with no cards (e.g. review keys whose content changed) would leave a blank screen.
-  const run = (session: Session) => { if (session.cards.length > 0) setView({ name: 'run', session }) }
+  const run = (session: Session) => { unlockAudio(); if (session.cards.length > 0) setView({ name: 'run', session }) }
 
   if (view.name === 'run') {
     const onFinish = (r: ExerciseResult[]) => setView({ name: 'finish', info: finish(view.session, r) })

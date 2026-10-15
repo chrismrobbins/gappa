@@ -83,6 +83,14 @@ romanization, English and each recorded voice) and flag fixes, which you then se
 
 Until 0002 is applied the app works as before; nobody sees teacher tools.
 
+## Offline
+
+Once the app has been opened online it launches and runs lessons offline (a hand-written service
+worker, `public/sw.js`, active in production builds only). Audio you have played is cached, and
+**Me → Settings → Offline audio** downloads every clip for your voice setting (about 15 MB for Mix)
+before a trip. Progress is saved on the device and syncs when you are back online. After a deploy,
+open the app once online to pick up the new version.
+
 ## Recording voices
 
 The course is recorded in every voice listed in `VOICES` (`src/config.ts`). The recorder collects every

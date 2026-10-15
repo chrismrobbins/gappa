@@ -60,12 +60,17 @@ function useDebouncedPush(enabled: boolean, progress: Progress): () => Promise<v
   return flush
 }
 
-/** Home-screen apps are often closed straight after a lesson: send what is pending first. */
+/** Home-screen apps are often closed straight after a lesson, or offline: send what is pending then and when back online. */
 function useFlushWhenHidden(flush: () => Promise<void>): void {
   useEffect(() => {
     const onChange = () => { if (document.visibilityState === 'hidden') void flush() }
+    const onOnline = () => void flush()
     document.addEventListener('visibilitychange', onChange)
-    return () => document.removeEventListener('visibilitychange', onChange)
+    window.addEventListener('online', onOnline)
+    return () => {
+      document.removeEventListener('visibilitychange', onChange)
+      window.removeEventListener('online', onOnline)
+    }
   }, [flush])
 }
 
